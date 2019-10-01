@@ -1,0 +1,248 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title></title>
+        
+        <meta name="robots" content="noindex" />
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 未完待续：又安全又好的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#通过链表学习rust-简体中文版" id="通过链表学习rust-简体中文版">《通过链表学习Rust》 简体中文版</a></h1>
+<blockquote>
+<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/README.md">README.md</a>
+<br>
+翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/c31a062c3dcae90e7bf2156d478878ec26c24a3e/src/README.md">commit c31a062</a></p>
+</blockquote>
+<blockquote>
+<p><strong>注意</strong>：在当前版本中，本书用的是 Rust 2018。如果你的工具链 (toolchain) 足够
+新，那么默认状态下，<code>Cargo.toml</code> 应该包含 <code>edition = 2018</code> 这一行（当然也可能
+是更大的数字）。用旧的工具链也不是不行，不过这相当于开启了<strong>困难模式</strong>。因为
+你可能遇到本书中所没有的编译问题。这个过程也是很有趣的！</p>
+</blockquote>
+<p>我经常被问起如何用 Rust 来实现链表，但这其实取决于你的需求是什么。很明显，这个
+问题没有简单的答案。所以我准备通过写这本书，一劳永逸地给出一个全面翔实的回答。</p>
+<p>在本书中，通过学习6种不同的链表实现方式，你将学到基本及进阶的 Rust 编程知识：</p>
+<ul>
+<li>下列指针类型：<code>&amp;</code>, <code>&amp;mut</code>, <code>Box</code>, <code>Rc</code>, <code>Arc</code>, <code>*const</code>, <code>*mut</code></li>
+<li>所有权，借用，承袭可变性，内部可变性，<code>Copy</code></li>
+<li>所有关键字：<code>struct</code>, <code>enum</code>, <code>fn</code>, <code>pub</code>, <code>impl</code>, <code>use</code>, ...</li>
+<li>模式匹配，泛型，析构器</li>
+<li>如何测试</li>
+<li>基本的 <code>unsafe</code> Rust</li>
+</ul>
+<p>的确，在Rust中写链表是真的麻烦，以上内容都有所涉及才能写出。</p>
+<p>本书所有内容都可在侧边栏中查看（移动端可能崩溃）。方便起见，这里也列出大纲以供参考：</p>
+<ol>
+<li><a href="first.html">差的栈实现（基于单向链表）</a></li>
+<li><a href="second.html">好的栈实现（基于单向链表）</a></li>
+<li><a href="third.html">可持久化的栈实现（基于单向链表）</a></li>
+<li><a href="fourth.html">差的双端队列实现（基于双向链表）</a></li>
+<li><a href="fifth.html">不安全的队列实现（基于单向链表）</a></li>
+<li><a href="sixth.html">未完待续：又安全又好的双端队列实现（基于双向链表）</a></li>
+<li><a href="infinity.html">附加：一些有问题的链表实现</a></li>
+</ol>
+<p>本书中，我会写出所有输入到终端的命令。也会用到 Cargo 包管理器来开发项目。它不是
+写 Rust 所必需的，但相较于直接用 rustc 编译器直接开发，用它还是会<strong>方便得多</strong>。
+另外，如果你只是想随便试试，可以用浏览器访问 <a href="https://play.rust-lang.org/">play.rust-lang.org</a>，来运行
+一些简单的程序。</p>
+<p>让我们开始吧！首先创建项目：</p>
+<pre><code class="language-text">&gt; cargo new --lib lists
+&gt; cd lists
+</code></pre>
+<p>我们准备为每一种实现方式都单独创建一个文件，这样就不会删来删去。</p>
+<p><strong>原汁原味</strong>的 Rust 学习流程应当包括写代码，被编译器怒斥，然后琢磨一堆错误是啥
+意思。我会尽量使这个过程多多发生。因为读懂 Rust 编译器的错误提示及相关文档（写的都很不错）的能力，对
+于进阶的 Rust 程序员是<strong>非常重要</strong>的。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
+        
+
+    </body>
+</html>
