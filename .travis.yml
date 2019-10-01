@@ -1,0 +1,14 @@
+language: rust
+rust:
+  - stable
+install:
+  - cargo install mdbook
+script:
+  - mdbook build
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GH_DEPLOY_TOKEN
+  keep_history: true
+  on:
+    branch: master
