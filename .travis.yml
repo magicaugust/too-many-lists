@@ -17,6 +17,7 @@ script:
 
 deploy:
   provider: pages
+  local-dir: book
   skip_cleanup: true
   github_token: $GH_DEPLOY_TOKEN
   keep_history: true
