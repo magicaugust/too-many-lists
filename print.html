@@ -80,7 +80,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 未完待续：又安全又好的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 内存分配</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 压入操作</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出操作</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 内存释放</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 代码清单</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,9 +163,9 @@
 问题没有简单的答案。所以我准备通过写这本书，一劳永逸地给出一个全面翔实的回答。</p>
 <p>在本书中，通过学习6种不同的链表实现方式，你将学到基本及进阶的 Rust 编程知识：</p>
 <ul>
-<li>下列指针类型：<code>&amp;</code>, <code>&amp;mut</code>, <code>Box</code>, <code>Rc</code>, <code>Arc</code>, <code>*const</code>, <code>*mut</code></li>
+<li>下列指针类型：<code>&amp;</code>，<code>&amp;mut</code>，<code>Box</code>，<code>Rc</code>，<code>Arc</code>，<code>*const</code>，<code>*mut</code></li>
 <li>所有权，借用，承袭可变性，内部可变性，<code>Copy</code></li>
-<li>所有关键字：<code>struct</code>, <code>enum</code>, <code>fn</code>, <code>pub</code>, <code>impl</code>, <code>use</code>, ...</li>
+<li>所有关键字：<code>struct</code>，<code>enum</code>，<code>fn</code>，<code>pub</code>，<code>impl</code>，<code>use</code>，...</li>
 <li>模式匹配，泛型，析构器</li>
 <li>如何测试</li>
 <li>基本的 <code>unsafe</code> Rust</li>
@@ -178,7 +178,7 @@
 <li><a href="third.html">可持久化的栈实现（基于单向链表）</a></li>
 <li><a href="fourth.html">差的双端队列实现（基于双向链表）</a></li>
 <li><a href="fifth.html">不安全的队列实现（基于单向链表）</a></li>
-<li><a href="sixth.html">未完待续：又安全又好的双端队列实现（基于双向链表）</a></li>
+<li><a href="sixth.html">未完待续：又好又安全的双端队列实现（基于双向链表）</a></li>
 <li><a href="infinity.html">附加：一些有问题的链表实现</a></li>
 </ol>
 <p>本书中，我会写出所有输入到终端的命令。也会用到 Cargo 包管理器来开发项目。它不是
@@ -191,8 +191,55 @@
 </code></pre>
 <p>我们准备为每一种实现方式都单独创建一个文件，这样就不会删来删去。</p>
 <p><strong>原汁原味</strong>的 Rust 学习流程应当包括写代码，被编译器怒斥，然后琢磨一堆错误是啥
-意思。我会尽量使这个过程多多发生。因为读懂 Rust 编译器的错误提示及相关文档（写的都很不错）的能力，对
-于进阶的 Rust 程序员是<strong>非常重要</strong>的。</p>
+意思。我会尽量使这个过程多多发生。因为读懂 Rust 编译器的错误提示及相关文档（写
+的都很不错）的能力，对于进阶的 Rust 程序员是<strong>非常重要</strong>的。</p>
+<p>事实上在写本书的过程中，我遇到的编译错误<strong>远比</strong>展示出来的多。特别是在后续章节
+中，我不会面面俱到地写出你们会碰到的编译问题。我只是这场旅途的导游。</p>
+<p>本书的节奏还是比较慢的，并且教学风格不会那么严肃。我觉得编程是一件很有意思的的
+事！如果你偏好更干货、更正式的内容，那么本书不适合你。</p>
+<h2><a class="header" href="#公益广告" id="公益广告">公益广告</a></h2>
+<p>有一点需要百分百明确：我讨厌链表！当然尽管是很糟糕的数据结构，链表也有一些用武之地：</p>
+<ul>
+<li>你有<strong>大量合并</strong>或拆分的操作需求。<strong>大量的</strong>。</li>
+<li>你想实现无锁并发。</li>
+<li>你在编写内核态/嵌入式程序。</li>
+<li>你在用函数式语言。由于语义匮乏及不可变性，相比于其它结构，链表更容易写。</li>
+<li>……</li>
+</ul>
+<p>但在真正写 Rust 程序时，这些情况都是很<strong>罕见</strong>的。99%的可能是你只需要用到 <code>Vec</code>
+（基于数组的栈）的功能，剩下1%可能会用到 <code>VecDeque</code>（基于数组的双端队列）。由于
+内存分配频率低、内存额外开销低，并且具有空间局部性以及真正的随机访问能力，这些
+数据结构在面对大多数负载时表现的更为优越。</p>
+<p>就像字典树（Trie）一样，链表是一种很<strong>特化</strong>、很<strong>小众</strong>的数据结构。我说字典树
+小众，很少会有人反驳。因为对于一个普通程序员而言，在整个职业生涯中都几乎不会去
+学它。然而链表却好像有着某种奇怪的特殊地位，每个本科生都学过怎么写链表。这在标
+准集合库（std::collections）中是唯一的，即 <a href="https://doc.rust-lang.org/std/collections/struct.LinkedList.html">LinkedList 集合</a>，
+在 C++ 标准库中则是 <a href="http://en.cppreference.com/w/cpp/container/list">list 容器</a>。</p>
+<p>从社区的角度，我们应当反对把链表当作「标准」的数据结构。在特定而非通用情况下，
+这个数据结构其实还不错。</p>
+<p>有的人读了上面第一段就不读了，然后用接下来的用途列表中的一项作为论据反驳我的观
+点。我可以贴出我和他们辩论的网址。但如果你只是想学点 Rust，随时可以跳到
+<a href="first.html">第一章</a>。</p>
+<h1><a class="header" href="#差的栈实现" id="差的栈实现">差的栈实现</a></h1>
+<blockquote>
+<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first.md">first.md</a>
+<br>
+翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/b57202a5e01b50e4217b85af3d89f49f612dcbae/src/first.md">commit b57202a</a></p>
+</blockquote>
+<p>这一章可能在本书中是最长的，因为要讲 Rust 的基础知识，甚至会故意绕弯路以便能更
+好理解这门语言。</p>
+<p>第一种链表实现方式会在<code>src/first.rs</code>中编写。为了让我们的项目能调用
+<code>first.rs</code>，需要在 Cargo 自动生成的<code>src/lib.rs</code>库文件开头写上一行：</p>
+<pre><code class="language-rust ignore">// in lib.rs
+pub mod first;
+</code></pre>
+<h1><a class="header" href="#内存布局" id="内存布局">内存布局</a></h1>
+<blockquote>
+<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-layout.md">first.md</a>
+<br>
+翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/0f4c26bfe58f81d3667eb214398a3cf99f66a7f2/src/first-layout.md">commit 0f4c26b</a></p>
+</blockquote>
+<h1><a class="header" href="#所有权" id="所有权">所有权</a></h1>
 
                     </main>
 
