@@ -151,6 +151,109 @@
 <br>
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/0f4c26bfe58f81d3667eb214398a3cf99f66a7f2/src/first-layout.md">commit 0f4c26b</a></p>
 </blockquote>
+<p>那么，什么是链表呢？说的简单一点，就是堆上的一系列数据，按顺序指向别的数据形成
+的结构。对使用过程式语言的程序员来说，链表是个大坑。不过函数式的拥趸却觉得用它
+可以构造一切。你要是问他们链表是什么，他们可能会给你如下的定义：</p>
+<pre><code class="language-haskell">List a = Empty | Elem a (List a)
+</code></pre>
+<p>意思是，一个链表要么是空表，要么是一个元素跟着一个链表。这是一种递归定义的
+<strong>和类型</strong>（<em>sum type</em>），即「可以具有不同类型的值的类型」。在 Rust 中，和类型
+被称作枚举类型 <code>enum</code>。如果你曾是 C-like 语言的程序员，应该会很熟悉这个名字。下
+面我们用 Rust 写出这个函数式版的定义：</p>
+<p>文件名：src/first.rs</p>
+<pre><code class="language-rust ignore">// pub 能让别人可以在模块外调用 List 类型
+pub enum List {
+    Empty,
+    Elem(i32, List),
+}
+</code></pre>
+<p>写完了！编译一下吧。</p>
+<pre><code class="language-text">$ cargo build
+   Compiling lists v0.1.0
+error[E0072]: recursive type `first::List` has infinite size
+ --&gt; src/first.rs:2:1
+  |
+2 | pub enum List {
+  | ^^^^^^^^^^^^^ recursive type has infinite size
+3 |     Empty,
+4 |     Elem(i32, List),
+  |               ---- recursive without indirection
+  |
+  = help: insert indirection (e.g., a `Box`, `Rc`, or `&amp;`) at some point to make
+ `first::List` representable
+</code></pre>
+<p>呃，我不知道你怎么想，反正我觉得我被函数式社区给坑了。</p>
+<p>如果仔细读一下出错信息，其实可以发现 rustc 编译器已经告诉我们解决之道了。</p>
+<blockquote>
+<p>提示：在某处添加间接修饰符，比如：<code>Box</code>，<code>Rc</code>，<code>&amp;</code>，可以让类型 <code>first::List</code> 成立。</p>
+</blockquote>
+<p>好吧，不过 <code>Box</code> 是什么东西？搜一下吧：</p>
+<blockquote>
+<p><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">std::boxed::Box - Rust</a></p>
+</blockquote>
+<p>摘录如下：</p>
+<blockquote>
+<p>【已翻译】</p>
+<p>Struct std::boxed::Box</p>
+<pre><code class="language-rust ignore">pub struct Box&lt;T&gt;(_)
+ where
+    T: ?Sized;
+</code></pre>
+<p>一种用于堆分配内存的指针类型。</p>
+<p>详细内容请参考<a href="https://doc.rust-lang.org/std/boxed/">相关模块文档</a>。</p>
+</blockquote>
+<p>点击链接：</p>
+<blockquote>
+<p>【已翻译】</p>
+<p>Module std::boxed</p>
+<p>一种用于堆分配内存的指针类型。</p>
+<p><code>Box&lt;T&gt;</code>，简称 box，提供了 Rust 中最简单的堆分配方式。在分配时获得所有权，并在
+离开作用域时释放内存。</p>
+<p>例子</p>
+<p>通过装箱，把数据从栈中转移到堆中：</p>
+<pre><code class="language-rust ignore">let val: u8 = 5;
+let boxed: Box&lt;u8&gt; = Box::new(val);
+</code></pre>
+<p>通过<a href="https://doc.rust-lang.org/std/ops/trait.Deref.html">解引用</a>，把数据从堆中转移到栈中：</p>
+<pre><code class="language-rust ignore">let boxed: Box&lt;u8&gt; = Box::new(5);
+let val: u8 = *boxed;
+</code></pre>
+<p>构造递归定义的数据结构：</p>
+<pre><pre class="playpen"><code class="language-rust">#[derive(Debug)]
+enum List&lt;T&gt; {
+    Cons(T, Box&lt;List&lt;T&gt;&gt;),
+    Nil,
+}
+
+fn main() {
+    let list: List&lt;i32&gt; =
+        List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));
+    println!(&quot;{:?}&quot;, list);
+}
+</code></pre></pre>
+<p>程序会输出 <code>Cons(1, Cons(2, Nil))</code>。</p>
+<p>递归类型必须被装箱，不然如果像下面这样定义：</p>
+<pre><code class="language-rust ignore"># enum List&lt;T&gt; {
+    Cons(T, List&lt;T&gt;),
+#     Nil,
+# }
+</code></pre>
+<p>这样会出错。因为 <code>List</code> 类型的大小依赖于内部元素的大小，但我们无法得知要给
+<code>Cons</code> 分配多大内存。通过引入确定大小的 <code>Box&lt;T&gt;</code>，解决了 <code>Cons</code> 大小不定的问
+题。</p>
+</blockquote>
+<p>哇！这可能是我见过最有帮助的文档了。开篇第一个内容就恰好是我们正尝试在写的程序，包括它可能错误的原因以及修正错误的办法。</p>
+<p>那我们就照办吧：</p>
+<pre><code class="language-rust ignore">pub enum List {
+    Empty,
+    Elem(i32, Box&lt;List&gt;),
+}
+</code></pre>
+<pre><code class="language-text">$ cargo build
+   Compiling lists v0.1.0
+    Finished dev [unoptimized + debuginfo] target(s) in 0.45s
+</code></pre>
+<p>成功编译过了！</p>
 
                     </main>
 

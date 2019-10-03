@@ -154,14 +154,14 @@
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/c31a062c3dcae90e7bf2156d478878ec26c24a3e/src/README.md">commit c31a062</a></p>
 </blockquote>
 <blockquote>
-<p><strong>注意</strong>：在当前版本中，本书用的是 Rust 2018。如果你的工具链 (toolchain) 足够
+<p><strong>注意</strong>：在当前版本中，本书用的是 Rust 2018。如果你的工具链（toolchain）足够
 新，那么默认状态下，<code>Cargo.toml</code> 应该包含 <code>edition = 2018</code> 这一行（当然也可能
 是更大的数字）。用旧的工具链也不是不行，不过这相当于开启了<strong>困难模式</strong>。因为
 你可能遇到本书中所没有的编译问题。这个过程也是很有趣的！</p>
 </blockquote>
 <p>我经常被问起如何用 Rust 来实现链表，但这其实取决于你的需求是什么。很明显，这个
 问题没有简单的答案。所以我准备通过写这本书，一劳永逸地给出一个全面翔实的回答。</p>
-<p>在本书中，通过学习6种不同的链表实现方式，你将学到基本及进阶的 Rust 编程知识：</p>
+<p>在本书中，通过学习 6 种不同的链表实现方式，你将学到基本及进阶的 Rust 编程知识：</p>
 <ul>
 <li>下列指针类型：<code>&amp;</code>，<code>&amp;mut</code>，<code>Box</code>，<code>Rc</code>，<code>Arc</code>，<code>*const</code>，<code>*mut</code></li>
 <li>所有权，借用，承袭可变性，内部可变性，<code>Copy</code></li>
@@ -170,8 +170,9 @@
 <li>如何测试</li>
 <li>基本的 <code>unsafe</code> Rust</li>
 </ul>
-<p>的确，在Rust中写链表是真的麻烦，以上内容都有所涉及才能写出。</p>
-<p>本书所有内容都可在侧边栏中查看（移动端可能崩溃）。方便起见，这里也列出大纲以供参考：</p>
+<p>的确，在 Rust 中写链表是真的麻烦，以上内容都有所涉及才能写出。</p>
+<p>本书所有内容都可在侧边栏中查看（移动端可能崩溃）。方便起见，这里也列出大纲以供
+参考：</p>
 <ol>
 <li><a href="first.html">差的栈实现（基于单向链表）</a></li>
 <li><a href="second.html">好的栈实现（基于单向链表）</a></li>
@@ -186,8 +187,9 @@
 另外，如果你只是想随便试试，可以用浏览器访问 <a href="https://play.rust-lang.org/">play.rust-lang.org</a>，来运行
 一些简单的程序。</p>
 <p>让我们开始吧！首先创建项目：</p>
-<pre><code class="language-text">&gt; cargo new --lib lists
-&gt; cd lists
+<pre><code class="language-text">$ cargo new --lib lists
+     Created library `lists` package
+$ cd lists
 </code></pre>
 <p>我们准备为每一种实现方式都单独创建一个文件，这样就不会删来删去。</p>
 <p><strong>原汁原味</strong>的 Rust 学习流程应当包括写代码，被编译器怒斥，然后琢磨一堆错误是啥
@@ -196,20 +198,21 @@
 <p>事实上在写本书的过程中，我遇到的编译错误<strong>远比</strong>展示出来的多。特别是在后续章节
 中，我不会面面俱到地写出你们会碰到的编译问题。我只是这场旅途的导游。</p>
 <p>本书的节奏还是比较慢的，并且教学风格不会那么严肃。我觉得编程是一件很有意思的的
-事！如果你偏好更干货、更正式的内容，那么本书不适合你。</p>
+事！如果你偏好更干货、更正经的教程，那么本书不适合你。</p>
 <h2><a class="header" href="#公益广告" id="公益广告">公益广告</a></h2>
-<p>有一点需要百分百明确：我讨厌链表！当然尽管是很糟糕的数据结构，链表也有一些用武之地：</p>
+<p>有一点需要百分百明确：我讨厌链表！当然尽管是很糟糕的数据结构，链表也有一些用武
+之地：</p>
 <ul>
-<li>你有<strong>大量合并</strong>或拆分的操作需求。<strong>大量的</strong>。</li>
+<li>你有<strong>大量</strong>合并或拆分的操作需求。<strong>大量的</strong>。</li>
 <li>你想实现无锁并发。</li>
-<li>你在编写内核态/嵌入式程序。</li>
+<li>你在编写内核态或嵌入式程序。</li>
 <li>你在用函数式语言。由于语义匮乏及不可变性，相比于其它结构，链表更容易写。</li>
 <li>……</li>
 </ul>
-<p>但在真正写 Rust 程序时，这些情况都是很<strong>罕见</strong>的。99%的可能是你只需要用到 <code>Vec</code>
-（基于数组的栈）的功能，剩下1%可能会用到 <code>VecDeque</code>（基于数组的双端队列）。由于
-内存分配频率低、内存额外开销低，并且具有空间局部性以及真正的随机访问能力，这些
-数据结构在面对大多数负载时表现的更为优越。</p>
+<p>但在真正写 Rust 程序时，这些情况都是很<strong>罕见</strong>的。99% 的可能是你只需要用到
+<code>Vec</code>（基于数组的栈）的功能，剩下1%可能会用到 <code>VecDeque</code>（基于数组的双端队
+列）。由于内存分配频率低、内存额外开销低，并且具有空间局部性以及真正的随机访问
+能力，这些数据结构在面对大多数负载时表现的更为优越。</p>
 <p>就像字典树（Trie）一样，链表是一种很<strong>特化</strong>、很<strong>小众</strong>的数据结构。我说字典树
 小众，很少会有人反驳。因为对于一个普通程序员而言，在整个职业生涯中都几乎不会去
 学它。然而链表却好像有着某种奇怪的特殊地位，每个本科生都学过怎么写链表。这在标
@@ -220,6 +223,16 @@
 <p>有的人读了上面第一段就不读了，然后用接下来的用途列表中的一项作为论据反驳我的观
 点。我可以贴出我和他们辩论的网址。但如果你只是想学点 Rust，随时可以跳到
 <a href="first.html">第一章</a>。</p>
+<h3><a class="header" href="#性能不是一切" id="性能不是一切">性能不是一切</a></h3>
+<p>无论程序是 I/O 密集型的，或是在偏僻的的角落无足轻重，都不能成为使用链表的理由
+你可以用任何数据结构，为什偏要用链表呢？用链式哈希表（linked hash map）！</p>
+<p>如果没有性能要求，最自然的选择使用基于数组的结构。</p>
+<h3><a class="header" href="#如果有了指针操作就是-o1-的" id="如果有了指针操作就是-o1-的">如果有了指针，操作就是 O(1) 的</a></h3>
+<p>对于合并、分拆、插入、删除操作来说，这是真的！尽管 C++ 之父 Bjarne Stroustrup
+<a href="https://www.youtube.com/watch?v=YQs6IC-vgmo">指出</a>，能否用获取指针的时间换取数组复制数据的时间并不重要（其实都很非
+常快）。因为在你的工作负载中，除非合并、拆分操作占了大头，否则由于局部性差，代
+码更复杂，链表产生的额外开销会抵消理论上的优势。</p>
+<p>话又说回来，如果真的有很多合并、拆分操作，用链表还是会提升性能的。</p>
 <h1><a class="header" href="#差的栈实现" id="差的栈实现">差的栈实现</a></h1>
 <blockquote>
 <p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first.md">first.md</a>
@@ -228,10 +241,10 @@
 </blockquote>
 <p>这一章可能在本书中是最长的，因为要讲 Rust 的基础知识，甚至会故意绕弯路以便能更
 好理解这门语言。</p>
-<p>第一种链表实现方式会在<code>src/first.rs</code>中编写。为了让我们的项目能调用
-<code>first.rs</code>，需要在 Cargo 自动生成的<code>src/lib.rs</code>库文件开头写上一行：</p>
-<pre><code class="language-rust ignore">// in lib.rs
-pub mod first;
+<p>第一种链表实现方式会在 <em>src/first.rs</em> 中编写。为了让我们要写的库能调用
+<em>first.rs</em>，需要在 Cargo 自动生成的 <em>src/lib.rs</em> 开头写上一行：</p>
+<p>文件名：src/lib.rs</p>
+<pre><code class="language-rust ignore">pub mod first;
 </code></pre>
 <h1><a class="header" href="#内存布局" id="内存布局">内存布局</a></h1>
 <blockquote>
@@ -239,6 +252,109 @@ pub mod first;
 <br>
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/0f4c26bfe58f81d3667eb214398a3cf99f66a7f2/src/first-layout.md">commit 0f4c26b</a></p>
 </blockquote>
+<p>那么，什么是链表呢？说的简单一点，就是堆上的一系列数据，按顺序指向别的数据形成
+的结构。对使用过程式语言的程序员来说，链表是个大坑。不过函数式的拥趸却觉得用它
+可以构造一切。你要是问他们链表是什么，他们可能会给你如下的定义：</p>
+<pre><code class="language-haskell">List a = Empty | Elem a (List a)
+</code></pre>
+<p>意思是，一个链表要么是空表，要么是一个元素跟着一个链表。这是一种递归定义的
+<strong>和类型</strong>（<em>sum type</em>），即「可以具有不同类型的值的类型」。在 Rust 中，和类型
+被称作枚举类型 <code>enum</code>。如果你曾是 C-like 语言的程序员，应该会很熟悉这个名字。下
+面我们用 Rust 写出这个函数式版的定义：</p>
+<p>文件名：src/first.rs</p>
+<pre><code class="language-rust ignore">// pub 能让别人可以在模块外调用 List 类型
+pub enum List {
+    Empty,
+    Elem(i32, List),
+}
+</code></pre>
+<p>写完了！编译一下吧。</p>
+<pre><code class="language-text">$ cargo build
+   Compiling lists v0.1.0
+error[E0072]: recursive type `first::List` has infinite size
+ --&gt; src/first.rs:2:1
+  |
+2 | pub enum List {
+  | ^^^^^^^^^^^^^ recursive type has infinite size
+3 |     Empty,
+4 |     Elem(i32, List),
+  |               ---- recursive without indirection
+  |
+  = help: insert indirection (e.g., a `Box`, `Rc`, or `&amp;`) at some point to make
+ `first::List` representable
+</code></pre>
+<p>呃，我不知道你怎么想，反正我觉得我被函数式社区给坑了。</p>
+<p>如果仔细读一下出错信息，其实可以发现 rustc 编译器已经告诉我们解决之道了。</p>
+<blockquote>
+<p>提示：在某处添加间接修饰符，比如：<code>Box</code>，<code>Rc</code>，<code>&amp;</code>，可以让类型 <code>first::List</code> 成立。</p>
+</blockquote>
+<p>好吧，不过 <code>Box</code> 是什么东西？搜一下吧：</p>
+<blockquote>
+<p><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">std::boxed::Box - Rust</a></p>
+</blockquote>
+<p>摘录如下：</p>
+<blockquote>
+<p>【已翻译】</p>
+<p>Struct std::boxed::Box</p>
+<pre><code class="language-rust ignore">pub struct Box&lt;T&gt;(_)
+ where
+    T: ?Sized;
+</code></pre>
+<p>一种用于堆分配内存的指针类型。</p>
+<p>详细内容请参考<a href="https://doc.rust-lang.org/std/boxed/">相关模块文档</a>。</p>
+</blockquote>
+<p>点击链接：</p>
+<blockquote>
+<p>【已翻译】</p>
+<p>Module std::boxed</p>
+<p>一种用于堆分配内存的指针类型。</p>
+<p><code>Box&lt;T&gt;</code>，简称 box，提供了 Rust 中最简单的堆分配方式。在分配时获得所有权，并在
+离开作用域时释放内存。</p>
+<p>例子</p>
+<p>通过装箱，把数据从栈中转移到堆中：</p>
+<pre><code class="language-rust ignore">let val: u8 = 5;
+let boxed: Box&lt;u8&gt; = Box::new(val);
+</code></pre>
+<p>通过<a href="https://doc.rust-lang.org/std/ops/trait.Deref.html">解引用</a>，把数据从堆中转移到栈中：</p>
+<pre><code class="language-rust ignore">let boxed: Box&lt;u8&gt; = Box::new(5);
+let val: u8 = *boxed;
+</code></pre>
+<p>构造递归定义的数据结构：</p>
+<pre><pre class="playpen"><code class="language-rust">#[derive(Debug)]
+enum List&lt;T&gt; {
+    Cons(T, Box&lt;List&lt;T&gt;&gt;),
+    Nil,
+}
+
+fn main() {
+    let list: List&lt;i32&gt; =
+        List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));
+    println!(&quot;{:?}&quot;, list);
+}
+</code></pre></pre>
+<p>程序会输出 <code>Cons(1, Cons(2, Nil))</code>。</p>
+<p>递归类型必须被装箱，不然如果像下面这样定义：</p>
+<pre><code class="language-rust ignore"># enum List&lt;T&gt; {
+    Cons(T, List&lt;T&gt;),
+#     Nil,
+# }
+</code></pre>
+<p>这样会出错。因为 <code>List</code> 类型的大小依赖于内部元素的大小，但我们无法得知要给
+<code>Cons</code> 分配多大内存。通过引入确定大小的 <code>Box&lt;T&gt;</code>，解决了 <code>Cons</code> 大小不定的问
+题。</p>
+</blockquote>
+<p>哇！这可能是我见过最有帮助的文档了。开篇第一个内容就恰好是我们正尝试在写的程序，包括它可能错误的原因以及修正错误的办法。</p>
+<p>那我们就照办吧：</p>
+<pre><code class="language-rust ignore">pub enum List {
+    Empty,
+    Elem(i32, Box&lt;List&gt;),
+}
+</code></pre>
+<pre><code class="language-text">$ cargo build
+   Compiling lists v0.1.0
+    Finished dev [unoptimized + debuginfo] target(s) in 0.45s
+</code></pre>
+<p>成功编译过了！</p>
 <h1><a class="header" href="#所有权" id="所有权">所有权</a></h1>
 
                     </main>
