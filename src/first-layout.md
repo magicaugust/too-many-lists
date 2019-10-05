@@ -47,7 +47,7 @@ error[E0072]: recursive type `first::List` has infinite size
 
 呃，我不知道你怎么想，反正我觉得我被函数式社区给坑了。
 
-如果仔细读一下出错信息，其实可以发现 rustc 编译器已经告诉我们解决之道了。
+如果仔细读一下出错信息，其实可以发现 rustc 编译器已经告诉了我们解决之道。
 
 > 提示：在某处添加间接修饰符，比如：`Box`，`Rc`，`&`，可以让类型 `first::List` 成立。
 
@@ -116,7 +116,7 @@ error[E0072]: recursive type `first::List` has infinite size
 >
 > 程序会输出 `Cons(1, Cons(2, Nil))`。
 >
-> 递归类型必须被装箱，不然如果像下面这样定义：
+> 递归类型必须被装箱，不然如果像下面这样定义 `Cons`：
 >
 > ```rust, ignore
 > # enum List<T> {
@@ -125,7 +125,7 @@ error[E0072]: recursive type `first::List` has infinite size
 > # }
 > ```
 >
-> 这样会出错。因为 `List` 类型的大小依赖于内部元素的大小，但我们无法得知要给
+> 就会出错。因为 `List` 类型的大小依赖于内部元素的大小，但我们无法得知要给
 > `Cons` 分配多大内存。通过引入确定大小的 `Box<T>`，解决了 `Cons` 大小不定的问
 > 题。
 
