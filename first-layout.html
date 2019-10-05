@@ -183,7 +183,7 @@ error[E0072]: recursive type `first::List` has infinite size
  `first::List` representable
 </code></pre>
 <p>呃，我不知道你怎么想，反正我觉得我被函数式社区给坑了。</p>
-<p>如果仔细读一下出错信息，其实可以发现 rustc 编译器已经告诉我们解决之道了。</p>
+<p>如果仔细读一下出错信息，其实可以发现 rustc 编译器已经告诉了我们解决之道。</p>
 <blockquote>
 <p>提示：在某处添加间接修饰符，比如：<code>Box</code>，<code>Rc</code>，<code>&amp;</code>，可以让类型 <code>first::List</code> 成立。</p>
 </blockquote>
@@ -232,13 +232,13 @@ fn main() {
 }
 </code></pre></pre>
 <p>程序会输出 <code>Cons(1, Cons(2, Nil))</code>。</p>
-<p>递归类型必须被装箱，不然如果像下面这样定义：</p>
+<p>递归类型必须被装箱，不然如果像下面这样定义 <code>Cons</code>：</p>
 <pre><code class="language-rust ignore"># enum List&lt;T&gt; {
     Cons(T, List&lt;T&gt;),
 #     Nil,
 # }
 </code></pre>
-<p>这样会出错。因为 <code>List</code> 类型的大小依赖于内部元素的大小，但我们无法得知要给
+<p>就会出错。因为 <code>List</code> 类型的大小依赖于内部元素的大小，但我们无法得知要给
 <code>Cons</code> 分配多大内存。通过引入确定大小的 <code>Box&lt;T&gt;</code>，解决了 <code>Cons</code> 大小不定的问
 题。</p>
 </blockquote>
