@@ -78,7 +78,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html" class="active"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 内存分配</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 压入操作</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出操作</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 内存释放</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 代码清单</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html" class="active"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 创建方法</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权初探</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 压入方法</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出方法</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 析构方法</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -147,7 +147,7 @@
                     <main>
                         <h1><a class="header" href="#内存布局" id="内存布局">内存布局</a></h1>
 <blockquote>
-<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-layout.md">first.md</a>
+<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-layout.md">first-layout.md</a>
 <br>
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/0f4c26bfe58f81d3667eb214398a3cf99f66a7f2/src/first-layout.md">commit 0f4c26b</a></p>
 </blockquote>
@@ -254,6 +254,63 @@ fn main() {
     Finished dev [unoptimized + debuginfo] target(s) in 0.45s
 </code></pre>
 <p>成功编译过了！</p>
+<p>不过，由于许多因素，这样定义链表有点蠢。</p>
+<p>考虑有两个元素的链表：</p>
+<pre><code class="language-text">[] = 栈
+() = 堆
+
+[Elem A, 指针] -&gt; (Elem B, 指针) -&gt; (Empty 垃圾数据)
+</code></pre>
+<p>有两个关键问题：</p>
+<ul>
+<li>我们给一个没有存储数据信息的结点分配了空间。</li>
+<li>其中一个结点却没有被分配空间。</li>
+</ul>
+<p>乍一看，这两个问题好像相互抵消了。尽管多用了一个结点，第一个结点却没必要在堆
+上分配。再看看另一种可能的布局：</p>
+<pre><code class="language-text">[指针] -&gt; (Elem A, 指针) -&gt; (Elem B, 空指针)
+</code></pre>
+<p>这种布局中，所有结点无一例外都在堆上分配。与第一种布局相比，最关键的区别在于没
+有了<strong>垃圾数据</strong>（<em>junk</em>）。这是什么东西？要理解它，首先得知道枚举类型在内存中
+是怎么样被安排的。</p>
+<pre><code class="language-rust ignore">enum Foo {
+    D1(T1),
+    D2(T2),
+    ...
+    Dn(Tn)n
+}
+</code></pre>
+<p><code>Foo</code> 类型的变量需要用一些整数来指示它是该枚举类型中的哪一种<strong>变体</strong>
+（<em>variant</em>），诸如 <code>D1</code>、<code>D2</code>、… <code>Dn</code>。同时它需要足够的空间来存储 <code>T1</code>、
+<code>T2</code>、… <code>Tn</code> 中最大的类型（可能会需要额外空间以满足内存对齐的要求）。</p>
+<p>这就造成了很大的缺陷：<code>Empty</code> 变体只含有一位的信息，却占用了一个元素加一个指针
+的空间，因为它随时可能转变为 <code>Elem</code> 变体。所以说在第一种布局中，多分配的那个结
+点包含的全是垃圾数据，会占用更多空间。</p>
+<p>对于第二点，可能会令人讶异：不分配第一个结点劣于总是在堆上分配结点。这是因为前者
+会造成<strong>内存布局不一致</strong>的问题。在压入、弹出操作中，影响不大，但如果要拆分、合
+并链表，就会很大的不同。</p>
+<p>考虑在两种布局中各自执行拆分操作：</p>
+<pre><code class="language-text">布局 1
+
+[Elem A, 指针] -&gt; (Elem B, 指针) -&gt; (Elem C, 指针) -&gt; (Empty 垃圾数据)
+
+在 C 处分裂：
+
+[Elem A, 指针] -&gt; (Elem B, 指针) -&gt; (Empty 垃圾数据)
+[Elem C, 指针] -&gt; (Empty 垃圾数据)
+</code></pre>
+<pre><code class="language-text">布局 2
+
+[指针] -&gt; (Elem A, 指针) -&gt; (Elem B, 指针) -&gt; (Elem C, 空指针)
+
+在 C 处分裂：
+
+[指针] -&gt; (Elem A, 指针) -&gt; (Elem B, 空指针)
+[指针] -&gt; (Elem C, 空指针)
+</code></pre>
+<p>在布局 2 的操作中，仅仅需要把 B 元素后继指针复制到栈上，然后置其为空指针。而布
+局 1 最终也要干同样的事，只不过是把整个 C 元素结点从堆中复制到栈上。合并操作亦
+然。</p>
 
                     </main>
 
