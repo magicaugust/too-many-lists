@@ -1,6 +1,6 @@
 # 内存布局
 
-> 原文链接：[first.md](https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-layout.md)
+> 原文链接：[first-layout.md](https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-layout.md)
 > <br>
 > 翻译基准：[commit 0f4c26b](https://github.com/rust-unofficial/too-many-lists/blob/0f4c26bfe58f81d3667eb214398a3cf99f66a7f2/src/first-layout.md)
 
@@ -147,6 +147,82 @@ $ cargo build
 ```
 
 成功编译过了！
+
+不过，由于许多因素，这样定义链表有点蠢。
+
+考虑有两个元素的链表：
+
+```text
+[] = 栈
+() = 堆
+
+[Elem A, 指针] -> (Elem B, 指针) -> (Empty 垃圾数据)
+```
+
+有两个关键问题：
+
+* 我们给一个没有存储数据信息的结点分配了空间。
+* 其中一个结点却没有被分配空间。
+
+乍一看，这两个问题好像相互抵消了。尽管多用了一个结点，第一个结点却没必要在堆
+上分配。再看看另一种可能的布局：
+
+```text
+[指针] -> (Elem A, 指针) -> (Elem B, 空指针)
+```
+
+这种布局中，所有结点无一例外都在堆上分配。与第一种布局相比，最关键的区别在于没
+有了**垃圾数据**（*junk*）。这是什么东西？要理解它，首先得知道枚举类型在内存中
+是怎么样被安排的。
+
+```rust, ignore
+enum Foo {
+    D1(T1),
+    D2(T2),
+    ...
+    Dn(Tn)n
+}
+```
+
+`Foo` 类型的变量需要用一些整数来指示它是该枚举类型中的哪一种**变体**
+（*variant*），诸如 `D1`、`D2`、… `Dn`。同时它需要足够的空间来存储 `T1`、
+`T2`、… `Tn` 中最大的类型（可能会需要额外空间以满足内存对齐的要求）。
+
+这就造成了很大的缺陷：`Empty` 变体只含有一位的信息，却占用了一个元素加一个指针
+的空间，因为它随时可能转变为 `Elem` 变体。所以说在第一种布局中，多分配的那个结
+点包含的全是垃圾数据，会占用更多空间。
+
+对于第二点，可能会令人讶异：不分配第一个结点劣于总是在堆上分配结点。这是因为前者
+会造成**内存布局不一致**的问题。在压入、弹出操作中，影响不大，但如果要拆分、合
+并链表，就会很大的不同。
+
+考虑在两种布局中各自执行拆分操作：
+
+```text
+布局 1
+
+[Elem A, 指针] -> (Elem B, 指针) -> (Elem C, 指针) -> (Empty 垃圾数据)
+
+在 C 处分裂：
+
+[Elem A, 指针] -> (Elem B, 指针) -> (Empty 垃圾数据)
+[Elem C, 指针] -> (Empty 垃圾数据)
+```
+
+```text
+布局 2
+
+[指针] -> (Elem A, 指针) -> (Elem B, 指针) -> (Elem C, 空指针)
+
+在 C 处分裂：
+
+[指针] -> (Elem A, 指针) -> (Elem B, 空指针)
+[指针] -> (Elem C, 空指针)
+```
+
+在布局 2 的操作中，仅仅需要把 B 元素后继指针复制到栈上，然后置其为空指针。而布
+局 1 最终也要干同样的事，只不过是把整个 C 元素结点从堆中复制到栈上。合并操作亦
+然。
 
 [box-doc]: https://doc.rust-lang.org/std/boxed/struct.Box.html
 [box-doc-more]: https://doc.rust-lang.org/std/boxed/
