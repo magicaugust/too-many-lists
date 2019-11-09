@@ -1,20 +1,13 @@
 language: rust
 sudo: false
-
 cache:
   - cargo
-
 rust:
   - stable
-
 before_script:
-  - (test -x $HOME/.cargo/bin/cargo-install-update || cargo install cargo-update)
-  - (test -x $HOME/.cargo/bin/mdbook || cargo install --vers "0.3.0" mdbook)
-  - cargo install-update -a
-
+  - (cargo install mdbook --vers 0.3.0 --force || true)
 script:
   - mdbook build
-
 deploy:
   provider: pages
   local-dir: book
