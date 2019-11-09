@@ -78,7 +78,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html" class="active"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 创建方法</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权初探</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 压入方法</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出方法</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 析构方法</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html" class="active"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> New 方法</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权初探</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push 方法</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop 方法</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop 方法</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -147,19 +147,13 @@
                     <main>
                         <h1><a class="header" href="#内存布局" id="内存布局">内存布局</a></h1>
 <blockquote>
-<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-layout.md">first-layout.md</a>
-<br>
+<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-layout.md">first-layout.md</a> <br>
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/0f4c26bfe58f81d3667eb214398a3cf99f66a7f2/src/first-layout.md">commit 0f4c26b</a></p>
 </blockquote>
-<p>那么，什么是链表呢？说的简单一点，就是堆上的一系列数据，按顺序指向别的数据形成
-的结构。对使用过程式语言的程序员来说，链表是个大坑。不过函数式的拥趸却觉得用它
-可以构造一切。你要是问他们链表是什么，他们可能会给你如下的定义：</p>
+<p>那么，什么是链表呢？说的简单一点，就是堆上的一系列数据，按顺序指向别的数据形成的结构。对使用过程式语言的程序员来说，链表是个大坑。不过函数式教徒却觉得用它可以构造一切。你要是问他们链表是什么，他们可能会给你如下的定义：</p>
 <pre><code class="language-haskell">List a = Empty | Elem a (List a)
 </code></pre>
-<p>意思是，一个链表要么是空表，要么是一个元素跟着一个链表。这是一种递归定义的
-<strong>和类型</strong>（<em>sum type</em>），即「可以具有不同类型的值的类型」。在 Rust 中，和类型
-被称作枚举类型 <code>enum</code>。如果你曾是 C-like 语言的程序员，应该会很熟悉这个名字。下
-面我们用 Rust 写出这个函数式版的定义：</p>
+<p>意思是，一个链表 <code>List</code> 要么是空表 <code>Empty</code>，要么持有一个元素 <code>Elem</code>，同时后面跟着下一个链表 <code>List</code>。这是一种递归定义的<strong>和类型</strong>（<em>sum type</em>），即「可以具有不同类型的值的类型」。在 Rust 中，和类型被称作枚举类型 <code>enum</code>。如果你曾是 C-like 语言的程序员，应该会很熟悉这个名字。下面我们用 Rust 写出这个函数式版的定义：</p>
 <p>文件名：src/first.rs</p>
 <pre><code class="language-rust ignore">// pub 能让别人可以在模块外调用 List 类型
 pub enum List {
@@ -194,7 +188,7 @@ error[E0072]: recursive type `first::List` has infinite size
 <p>摘录如下：</p>
 <blockquote>
 <p>【已翻译】</p>
-<p>Struct std::boxed::Box</p>
+<h2><a class="header" href="#struct-stdboxedbox" id="struct-stdboxedbox">Struct std::boxed::Box</a></h2>
 <pre><code class="language-rust ignore">pub struct Box&lt;T&gt;(_)
  where
     T: ?Sized;
@@ -205,11 +199,11 @@ error[E0072]: recursive type `first::List` has infinite size
 <p>点击链接：</p>
 <blockquote>
 <p>【已翻译】</p>
-<p>Module std::boxed</p>
+<h2><a class="header" href="#module-stdboxed" id="module-stdboxed">Module std::boxed</a></h2>
 <p>一种用于堆分配内存的指针类型。</p>
-<p><code>Box&lt;T&gt;</code>，简称 box，提供了 Rust 中最简单的堆分配方式。在分配时获得所有权，并在
-离开作用域时释放内存。</p>
-<p>例子</p>
+<p><code>Box&lt;T&gt;</code>，简称 box，提供了 Rust 中最简单的堆分配方式。在分配内存时获得所有
+权，并在离开作用域时释放内存。</p>
+<h3><a class="header" href="#例子" id="例子">例子</a></h3>
 <p>通过装箱，把数据从栈中转移到堆中：</p>
 <pre><code class="language-rust ignore">let val: u8 = 5;
 let boxed: Box&lt;u8&gt; = Box::new(val);
@@ -238,9 +232,7 @@ fn main() {
 #     Nil,
 # }
 </code></pre>
-<p>就会出错。因为 <code>List</code> 类型的大小依赖于内部元素的大小，但我们无法得知要给
-<code>Cons</code> 分配多大内存。通过引入确定大小的 <code>Box&lt;T&gt;</code>，解决了 <code>Cons</code> 大小不定的问
-题。</p>
+<p>就会出错。因为 <code>List</code> 类型的大小依赖于内部元素的大小，但我们无法得知要给 <code>Cons</code> 分配多大内存。通过引入确定大小的 <code>Box&lt;T&gt;</code>，解决了 <code>Cons</code> 大小不定的问题。</p>
 </blockquote>
 <p>哇！这可能是我见过最有帮助的文档了。开篇第一个内容就恰好是我们正尝试在写的程序，包括它可能错误的原因以及修正错误的办法。</p>
 <p>那我们就照办吧：</p>
@@ -254,8 +246,7 @@ fn main() {
     Finished dev [unoptimized + debuginfo] target(s) in 0.45s
 </code></pre>
 <p>成功编译过了！</p>
-<p>不过，由于许多因素，这样定义链表有点蠢。</p>
-<p>考虑有两个元素的链表：</p>
+<p>不过，从很多方面来看，这样定义链表实际上很蠢。考虑有两个元素的链表：</p>
 <pre><code class="language-text">[] = 栈
 () = 堆
 
@@ -266,13 +257,10 @@ fn main() {
 <li>我们给一个没有存储数据信息的结点分配了空间。</li>
 <li>其中一个结点却没有被分配空间。</li>
 </ul>
-<p>乍一看，这两个问题好像相互抵消了。尽管多用了一个结点，第一个结点却没必要在堆
-上分配。再看看另一种可能的布局：</p>
+<p>乍一看，这两个问题好像相互抵消了。尽管多用了一个结点，第一个结点却没必要在堆上分配。再看看另一种可能的布局：</p>
 <pre><code class="language-text">[指针] -&gt; (Elem A, 指针) -&gt; (Elem B, 空指针)
 </code></pre>
-<p>这种布局中，所有结点无一例外都在堆上分配。与第一种布局相比，最关键的区别在于没
-有了<strong>垃圾数据</strong>（<em>junk</em>）。这是什么东西？要理解它，首先得知道枚举类型在内存中
-是怎么样被安排的。</p>
+<p>这种布局中，所有结点无一例外都在堆上分配。与第一种布局相比，最关键的区别在于没有了<strong>垃圾数据</strong>（<em>junk</em>）。这是什么东西？要理解它，首先得知道枚举类型在内存中是怎么样被安排的。</p>
 <pre><code class="language-rust ignore">enum Foo {
     D1(T1),
     D2(T2),
@@ -280,16 +268,10 @@ fn main() {
     Dn(Tn)n
 }
 </code></pre>
-<p><code>Foo</code> 类型的变量需要用一些整数来指示它是该枚举类型中的哪一种<strong>变体</strong>
-（<em>variant</em>），诸如 <code>D1</code>、<code>D2</code>、… <code>Dn</code>。同时它需要足够的空间来存储 <code>T1</code>、
-<code>T2</code>、… <code>Tn</code> 中最大的类型（可能会需要额外空间以满足内存对齐的要求）。</p>
-<p>这就造成了很大的缺陷：<code>Empty</code> 变体只含有一位的信息，却占用了一个元素加一个指针
-的空间，因为它随时可能转变为 <code>Elem</code> 变体。所以说在第一种布局中，多分配的那个结
-点包含的全是垃圾数据，会占用更多空间。</p>
-<p>对于第二点，可能会令人讶异：不分配第一个结点劣于总是在堆上分配结点。这是因为前者
-会造成<strong>内存布局不一致</strong>的问题。在压入、弹出操作中，影响不大，但如果要拆分、合
-并链表，就会很大的不同。</p>
-<p>考虑在两种布局中各自执行拆分操作：</p>
+<p><code>Foo</code> 类型的变量需要用一些整数来指示它是该枚举类型中的哪一种<strong>变体</strong>（<em>variant</em>），诸如 <code>D1</code>、<code>D2</code>、… <code>Dn</code>。这样的整数称作枚举类型的<strong>标志</strong>（<em>tag</em>）。同时它需要足够的空间来存储 <code>T1</code>、<code>T2</code>、… <code>Tn</code> 中最大的类型（可能要额外的空间以满足内存对齐的要求）。</p>
+<p>这就造成了很大的缺陷：<code>Empty</code> 变体只含有一位的信息，却占用了一个元素加一个指针的空间，因为它随时可能转变为 <code>Elem</code> 变体。所以说在第一种布局中，多分配的那个结点包含的全是垃圾数据，会占用更多空间。</p>
+<p>对于第二点，可能会令人惊讶：不分配第一个结点劣于总是在堆上分配结点。这是因为前者会造成<strong>内存布局不一致</strong>的问题。在压入、弹出操作中，影响不大，但如果要拆分、合并链表，就大不一样了。</p>
+<p>考虑在两种内存布局中，各自执行拆分操作：</p>
 <pre><code class="language-text">布局 1
 
 [Elem A, 指针] -&gt; (Elem B, 指针) -&gt; (Elem C, 指针) -&gt; (Empty 垃圾数据)
@@ -308,9 +290,60 @@ fn main() {
 [指针] -&gt; (Elem A, 指针) -&gt; (Elem B, 空指针)
 [指针] -&gt; (Elem C, 空指针)
 </code></pre>
-<p>在布局 2 的操作中，仅仅需要把 B 元素后继指针复制到栈上，然后置其为空指针。而布
-局 1 最终也要干同样的事，只不过是把整个 C 元素结点从堆中复制到栈上。合并操作亦
-然。</p>
+<p>在布局 2 的操作中，仅仅需要把 B 元素后继指针复制到栈上，然后置其为空指针。而布局 1 最终也要干同样的事，只不过是把整个 C 元素结点从堆中复制到栈上。合并操作亦然。</p>
+<p>在链表为数不多的优点中，有一点就是：当你在结点中创建完元素后，就可以随意地移动它到表中的任何位置而无需复制内存，因为只要修改对应指针就行了。如果用了布局 1，这样的优点就不复存在了。</p>
+<p>现在我们有充足的理由认为原来的布局很糟糕。那要怎么重写呢？也许是这样：</p>
+<pre><code class="language-rust ignore">pub enum List {
+    Empty,
+    ElemThenEmpty(i32),
+    ElemThenNotEmpty(i32, Box&lt;List&gt;),
+}
+</code></pre>
+<p>希望你能看出这样设计更加糟糕。最明显的是它将原本简单的逻辑复杂化了，因为凭空出现了一种非法状态 <code>ElemThenNotEmpty(0, Box(Empty))</code>。同时，它<strong>也没有</strong>解决内存分配不一致的问题。</p>
+<p>不过，这种布局确实有一个优点：无需为 <code>Empty</code> 变体分配空间，堆分配次数也减少了一次。但如果真的这么做，很遗憾，它会耗费<strong>更多空间</strong>。这是因为原来的布局利用到了<strong>空指针优化</strong>。</p>
+<p>之前我们说到，每个枚举变量都会有<strong>标志</strong>来标明它是哪种变体。但如果是这样的枚举类型：</p>
+<pre><code class="language-rust ignore">enum Foo {
+    A,
+    B(NonNullPtr),
+}
+</code></pre>
+<p>空指针优化就能起作用了。它可以<strong>节省标签占用的空间</strong>。如果是变体 <code>A</code>，就将储存内容全部置零。反之，非零内容则代表变体 <code>B</code>。这种优化运用到了变体 <code>B</code> 包含非空指针的的性质。酷！</p>
+<p>想想看，还有没有别处会用到类似的优化？其实有很多！这也是为什么 Rust 不让你指定枚举类型的内存布局。在其他一些更复杂的情形中，Rust 也能做出优化。但是空指针优化绝对是最重要的。因为有了它就意味着 <code>&amp;</code>，<code>&amp;mut</code>，<code>Box</code>，<code>Rc</code>，<code>Arc</code>，<code>Vec</code> 等重要类型可以被无额外开销地放入 <code>Option</code> 结构中。（在本书完结前，这几种类型基本都能讲到。）</p>
+<p>那么，怎么才能避免垃圾数据的额外开销，同时拥有一致的内存分配<strong>以及</strong>美妙的空指针优化呢？我们最好把存放此处元素的空间，与为下一链表所分配的空间分开考虑。要想做到这一点，我们得先想一想 C-like 语言：结构体！</p>
+<p>对于我们声明的类型而言，如果说枚举体能让它持有若干值中的<strong>一种</strong>，那么结构体就能使它同时拥有<strong>多个</strong>值。据此，我们可以将原来的 <code>List</code> 类型拆成两部分：<code>List</code> 与  <code>Node</code> 类型。</p>
+<p>与之前说的一样，一个链表要么是空表，要么持有一个元素，同时后面跟着下一个链表。现在，我们通过用一个完全独立的类型来实现「持有一个元素，同时后面跟着下一个链表」，从而可以将 <code>Box</code> 放置在一处更优的位置上。</p>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+struct Node {
+    elem: i32,
+    next: List,
+}
+
+pub enum List {
+    Empty,
+    More(Box&lt;Node&gt;)
+}
+#}</code></pre></pre>
+<p>让我们逐个核对一下：</p>
+<ul>
+<li>链表末尾没有额外的垃圾数据：通过！</li>
+<li><code>enum</code> 类型符合空指针优化的要求：通过！</li>
+<li>所有元素都有一致的内存布局：通过！</li>
+</ul>
+<p>不错！实际上，我们只不过是构造出了一种新的布局来证明原先的布局（Rust 官方文档所建议的那个）是有问题的。</p>
+<pre><code class="language-text">$ cargo build
+   Compiling lists v0.1.0
+error[E0446]: private type `first::Node` in public interface
+ --&gt; src/first.rs:8:10
+  |
+1 | struct Node {
+  | - `first::Node` declared as private
+...
+8 |     More(Box&lt;Node&gt;)
+  |          ^^^^^^^^^ can't leak private type
+</code></pre>
+<p>🙁</p>
 
                     </main>
 

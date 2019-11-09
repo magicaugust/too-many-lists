@@ -78,7 +78,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html" class="active"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 创建方法</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权初探</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 压入方法</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出方法</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 析构方法</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html" class="active"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> New 方法</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权初探</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push 方法</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop 方法</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop 方法</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -147,14 +147,11 @@
                     <main>
                         <h1><a class="header" href="#差的栈实现" id="差的栈实现">差的栈实现</a></h1>
 <blockquote>
-<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first.md">first.md</a>
-<br>
+<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first.md">first.md</a> <br>
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/b57202a5e01b50e4217b85af3d89f49f612dcbae/src/first.md">commit b57202a</a></p>
 </blockquote>
-<p>这一章可能在本书中是最长的，因为要讲 Rust 的基础知识，甚至会故意绕弯路以便能更
-好理解这门语言。</p>
-<p>第一种链表实现方式会在 <em>src/first.rs</em> 中编写。为了让我们要写的库能调用
-<em>first.rs</em>，需要在 Cargo 自动生成的 <em>src/lib.rs</em> 开头写上一行：</p>
+<p>这一章可能在本书中是最长的，因为要讲 Rust 的基础知识，甚至会故意绕弯路以便能更好理解这门语言。</p>
+<p>第一种链表实现方式会在 <em>src/first.rs</em> 中编写。为了让我们要写的库能调用 <em>first.rs</em>，需要在 Cargo 自动生成的 <em>src/lib.rs</em> 开头写上一行：</p>
 <p>文件名：src/lib.rs</p>
 <pre><code class="language-rust ignore">pub mod first;
 </code></pre>

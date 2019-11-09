@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>创建方法 - </title>
+        <title>New 方法 - </title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -78,7 +78,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html" class="active"><strong aria-hidden="true">2.2.</strong> 创建方法</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权初探</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 压入方法</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出方法</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 析构方法</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 差的栈实现</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 内存布局</a></li><li><a href="first-new.html" class="active"><strong aria-hidden="true">2.2.</strong> New 方法</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权初探</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> Push 方法</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> Pop 方法</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 单元测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> Drop 方法</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 好的栈实现</a></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 可持久化的栈实现</a></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 差的双端队列实现</a></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 不安全的队列实现</a></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 又好又安全的双端队列实现</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一些有问题的链表实现</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -147,8 +147,7 @@
                     <main>
                         <h1><a class="header" href="#创建方法" id="创建方法">创建方法</a></h1>
 <blockquote>
-<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-new.md">first-new.md</a>
-<br>
+<p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-new.md">first-new.md</a> <br>
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/b57202a5e01b50e4217b85af3d89f49f612dcbae/src/first-new.md">commit b57202a</a></p>
 </blockquote>
 <p>为了将代码与类型关联起来，我们需要用 <code>impl</code> 块。</p>
@@ -156,9 +155,16 @@
     // TODO: 使功能奏效的代码
 }
 </code></pre>
-<p>现在我们要搞明白如何真正地写一行代码，Rust 用如下地格式定义函数：</p>
+<p>现在我们得要知道如何写代码，Rust 用如下格式定义函数：</p>
 <pre><code class="language-rust ignore">fn func_name(arg1: Type1, arg2: Type2) -&gt; ReturnType {
     // 函数体
+}
+</code></pre>
+<p>首先要考虑如何<strong>创建</strong>链表。既然要隐藏内部的实现细节，就要对外提供函数接口。在 Rust 中，常常用静态方法（static method）完成这个任务。其实就是 <code>impl</code> 块中的一个普通函数：</p>
+<pre><code class="language-rust ignore">impl List {
+    pub fn new() -&gt; self {
+        List { head: Link::Empty }
+    }
 }
 </code></pre>
 
