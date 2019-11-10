@@ -265,7 +265,7 @@ fn main() {
     D1(T1),
     D2(T2),
     ...
-    Dn(Tn)n
+    Dn(Tn),
 }
 </code></pre>
 <p><code>Foo</code> 类型的变量需要用一些整数来指示它是该枚举类型中的哪一种<strong>变体</strong>（<em>variant</em>），诸如 <code>D1</code>、<code>D2</code>、… <code>Dn</code>。这样的整数称作枚举类型的<strong>标志</strong>（<em>tag</em>）。同时它需要足够的空间来存储 <code>T1</code>、<code>T2</code>、… <code>Tn</code> 中最大的类型（可能要额外的空间以满足内存对齐的要求）。</p>
@@ -312,19 +312,16 @@ fn main() {
 <p>那么，怎么才能避免垃圾数据的额外开销，同时拥有一致的内存分配<strong>以及</strong>美妙的空指针优化呢？我们最好把存放此处元素的空间，与为下一链表所分配的空间分开考虑。要想做到这一点，我们得先想一想 C-like 语言：结构体！</p>
 <p>对于我们声明的类型而言，如果说枚举体能让它持有若干值中的<strong>一种</strong>，那么结构体就能使它同时拥有<strong>多个</strong>值。据此，我们可以将原来的 <code>List</code> 类型拆成两部分：<code>List</code> 与  <code>Node</code> 类型。</p>
 <p>与之前说的一样，一个链表要么是空表，要么持有一个元素，同时后面跟着下一个链表。现在，我们通过用一个完全独立的类型来实现「持有一个元素，同时后面跟着下一个链表」，从而可以将 <code>Box</code> 放置在一处更优的位置上。</p>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-struct Node {
+<pre><code class="language-rust ignore">struct Node {
     elem: i32,
     next: List,
 }
 
 pub enum List {
     Empty,
-    More(Box&lt;Node&gt;)
+    More(Box&lt;Node&gt;),
 }
-#}</code></pre></pre>
+</code></pre>
 <p>让我们逐个核对一下：</p>
 <ul>
 <li>链表末尾没有额外的垃圾数据：通过！</li>
