@@ -167,7 +167,7 @@ enum Foo {
     D1(T1),
     D2(T2),
     ...
-    Dn(Tn)n
+    Dn(Tn),
 }
 ```
 
@@ -238,7 +238,7 @@ enum Foo {
 
 与之前说的一样，一个链表要么是空表，要么持有一个元素，同时后面跟着下一个链表。现在，我们通过用一个完全独立的类型来实现「持有一个元素，同时后面跟着下一个链表」，从而可以将 `Box` 放置在一处更优的位置上。
 
-```rust
+```rust, ignore
 struct Node {
     elem: i32,
     next: List,
@@ -246,9 +246,9 @@ struct Node {
 
 pub enum List {
     Empty,
-    More(Box<Node>)
+    More(Box<Node>),
 }
-```
+```  
 
 让我们逐个核对一下：
 

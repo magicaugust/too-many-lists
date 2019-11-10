@@ -1,18 +1,25 @@
 language: rust
 sudo: false
 cache:
-  - cargo
+- cargo
 rust:
-  - stable
-before_script:
-  - (cargo install mdbook --vers 0.3.0 --force || true)
+- stable
+addons:
+  ssh_known_hosts: cheronder.com
+before_install:
+- openssl aes-256-cbc -K $encrypted_c5c7c7764140_key -iv $encrypted_c5c7c7764140_iv
+  -in travis.key.enc -out ~/.ssh/id_rsa -d
+- chmod 600 ~/.ssh/id_rsa
+install:
+- "(cargo install mdbook --vers 0.3.0 --force || true)"
 script:
-  - mdbook build
+- mdbook build
+- rsync -azv -delete -e 'ssh' book/ vps@cheronder.com:/var/www/static/too-many-lists
 deploy:
   provider: pages
   local-dir: book
   skip_cleanup: true
-  github_token: $GH_DEPLOY_TOKEN
+  github_token: "$GH_DEPLOY_TOKEN"
   keep_history: true
   on:
     branch: master

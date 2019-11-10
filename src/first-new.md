@@ -7,7 +7,7 @@
 
 ```rust, ignore
 impl List {
-    // TODO: 使功能奏效的代码
+    // TODO: 实现相关功能的代码
 }
 ```
 
