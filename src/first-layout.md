@@ -203,7 +203,7 @@ enum Foo {
 
 在布局 2 的操作中，仅仅需要把 B 元素后继指针复制到栈上，然后置其为空指针。而布局 1 最终也要干同样的事，只不过是把整个 C 元素结点从堆中复制到栈上。合并操作亦然。
 
-在链表为数不多的优点中，有一点就是：当你在结点中创建完元素后，就可以随意地移动它到表中的任何位置而无需复制内存，因为只要修改对应指针就行了。如果用了布局 1，这样的优点就不复存在了。
+在链表为数不多的优点中，有一点就是：当你在结点中创建完元素后，就可以随意地移动它到表中的任何位置而无须复制内存，因为只要修改对应指针就行了。如果用了布局 1，这样的优点就不复存在了。
 
 现在我们有充足的理由认为原来的布局很糟糕。那要怎么重写呢？也许是这样：
 
@@ -217,7 +217,7 @@ pub enum List {
 
 希望你能看出这样设计更加糟糕。最明显的是它将原本简单的逻辑复杂化了，因为凭空出现了一种非法状态 `ElemThenNotEmpty(0, Box(Empty))`。同时，它**也没有**解决内存分配不一致的问题。
 
-不过，这种布局确实有一个优点：无需为 `Empty` 变体分配空间，堆分配次数也减少了一次。但如果真的这么做，很遗憾，它会耗费**更多空间**。这是因为原来的布局利用到了**空指针优化**。
+不过，这种布局确实有一个优点：无须为 `Empty` 变体分配空间，堆分配次数也减少了一次。但如果真的这么做，很遗憾，它会耗费**更多空间**。这是因为原来的布局利用到了**空指针优化**。
 
 之前我们说到，每个枚举变量都会有**标志**来标明它是哪种变体。但如果是这样的枚举类型：
 
@@ -248,7 +248,7 @@ pub enum List {
     Empty,
     More(Box<Node>),
 }
-```  
+```
 
 让我们逐个核对一下：
 
@@ -272,6 +272,64 @@ error[E0446]: private type `first::Node` in public interface
 ```
 
 🙁
+
+Rust 又对我们发怒了。为了别人能使用 `List`，我们将其访问权限设置为公有 `pub`，但 `Node` 不是这样。问题在于公有枚举体的所有内部变体也都是公有的，而私有类型不能出现在公有的地方。理论上我们可以也把 `Node` 设为公有类型，但这不符合 Rust 编程风格，我们应该将实现细节隐藏起来。为达成这一点，我们可以将 `List` 设成结构体：
+
+```rust, ignore
+pub struct List {
+    head: Link,
+}
+
+enum Link {
+    Empty,
+    More(Box<Node>),
+}
+
+struct Node {
+    elem: i32,
+    next: Link,
+}
+```
+
+由于结构体 `List` 只有一个字段，那么它的大小即是字段的大小。为零抽象开销点赞！
+
+```text
+$ cargo build
+   Compiling lists v0.1.0
+warning: field is never used: `head`
+ --> src/first.rs:2:5
+  |
+2 |     head: Link,
+  |     ^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: variant is never constructed: `Empty`
+ --> src/first.rs:6:5
+  |
+6 |     Empty,
+  |     ^^^^^
+
+warning: variant is never constructed: `More`
+ --> src/first.rs:7:5
+  |
+7 |     More(Box<Node>),
+  |     ^^^^^^^^^^^^^^^
+
+warning: field is never used: `elem`
+  --> src/first.rs:11:5
+   |
+11 |     elem: i32,
+   |     ^^^^^^^^^
+
+warning: field is never used: `next`
+  --> src/first.rs:12:5
+   |
+12 |     next: Link,
+   |
+```
+
+终于编译过了！不过 Rust 依旧很生气，它说我们所写的代码都是无用功。这是因为 `head` 从来没有被我们用到过，而作为私有字段，它也不能被别人访问。同理，`Link` 与 `Node` 中的代码也是毫无用处的。要解决这一问题，就得为我们的 `List` 实现相关功能。
 
 [box-doc]: https://doc.rust-lang.org/std/boxed/struct.Box.html
 [box-doc-more]: https://doc.rust-lang.org/std/boxed/
