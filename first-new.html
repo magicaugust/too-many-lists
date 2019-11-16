@@ -145,7 +145,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#创建方法" id="创建方法">创建方法</a></h1>
+                        <h1><a class="header" href="#new-方法" id="new-方法">New 方法</a></h1>
 <blockquote>
 <p>原文链接：<a href="https://github.com/rust-unofficial/too-many-lists/blob/master/src/first-new.md">first-new.md</a> <br>
 翻译基准：<a href="https://github.com/rust-unofficial/too-many-lists/blob/b57202a5e01b50e4217b85af3d89f49f612dcbae/src/first-new.md">commit b57202a</a></p>
@@ -162,11 +162,26 @@
 </code></pre>
 <p>首先要考虑如何<strong>创建</strong>链表。既然要隐藏内部的实现细节，就要对外提供函数接口。在 Rust 中，常常用静态方法（static method）完成这个任务。其实就是 <code>impl</code> 块中的一个普通函数：</p>
 <pre><code class="language-rust ignore">impl List {
-    pub fn new() -&gt; self {
+    pub fn new() -&gt; Self {
         List { head: Link::Empty }
     }
 }
 </code></pre>
+<p>有几个要点：</p>
+<ul>
+<li>
+<p><code>Self</code> 指代 <code>impl</code> 后面跟的那个类型。这样就避免重复了。</p>
+</li>
+<li>
+<p>我们构造结构体实例的方式几乎与声明它的方式一样。唯一的不同点在于跟在字段后边的不是类型，而是初始化它们所用的值。</p>
+</li>
+<li>
+<p>我们用作用域符 <code>::</code> 来表示枚举类型的某个变体。</p>
+</li>
+<li>
+<p>函数中的最后一个表达式会隐式地被返回。这样做可以使代码更整洁。同时与其他 C-like 语言一样，你仍然可以用 <code>return</code> 语句来提早返回。</p>
+</li>
+</ul>
 
                     </main>
 

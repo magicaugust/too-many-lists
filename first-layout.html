@@ -291,7 +291,7 @@ fn main() {
 [指针] -&gt; (Elem C, 空指针)
 </code></pre>
 <p>在布局 2 的操作中，仅仅需要把 B 元素后继指针复制到栈上，然后置其为空指针。而布局 1 最终也要干同样的事，只不过是把整个 C 元素结点从堆中复制到栈上。合并操作亦然。</p>
-<p>在链表为数不多的优点中，有一点就是：当你在结点中创建完元素后，就可以随意地移动它到表中的任何位置而无需复制内存，因为只要修改对应指针就行了。如果用了布局 1，这样的优点就不复存在了。</p>
+<p>在链表为数不多的优点中，有一点就是：当你在结点中创建完元素后，就可以随意地移动它到表中的任何位置而无须复制内存，因为只要修改对应指针就行了。如果用了布局 1，这样的优点就不复存在了。</p>
 <p>现在我们有充足的理由认为原来的布局很糟糕。那要怎么重写呢？也许是这样：</p>
 <pre><code class="language-rust ignore">pub enum List {
     Empty,
@@ -300,7 +300,7 @@ fn main() {
 }
 </code></pre>
 <p>希望你能看出这样设计更加糟糕。最明显的是它将原本简单的逻辑复杂化了，因为凭空出现了一种非法状态 <code>ElemThenNotEmpty(0, Box(Empty))</code>。同时，它<strong>也没有</strong>解决内存分配不一致的问题。</p>
-<p>不过，这种布局确实有一个优点：无需为 <code>Empty</code> 变体分配空间，堆分配次数也减少了一次。但如果真的这么做，很遗憾，它会耗费<strong>更多空间</strong>。这是因为原来的布局利用到了<strong>空指针优化</strong>。</p>
+<p>不过，这种布局确实有一个优点：无须为 <code>Empty</code> 变体分配空间，堆分配次数也减少了一次。但如果真的这么做，很遗憾，它会耗费<strong>更多空间</strong>。这是因为原来的布局利用到了<strong>空指针优化</strong>。</p>
 <p>之前我们说到，每个枚举变量都会有<strong>标志</strong>来标明它是哪种变体。但如果是这样的枚举类型：</p>
 <pre><code class="language-rust ignore">enum Foo {
     A,
@@ -341,6 +341,57 @@ error[E0446]: private type `first::Node` in public interface
   |          ^^^^^^^^^ can't leak private type
 </code></pre>
 <p>🙁</p>
+<p>Rust 又对我们发怒了。为了别人能使用 <code>List</code>，我们将其访问权限设置为公有 <code>pub</code>，但 <code>Node</code> 不是这样。问题在于公有枚举体的所有内部变体也都是公有的，而私有类型不能出现在公有的地方。理论上我们可以也把 <code>Node</code> 设为公有类型，但这不符合 Rust 编程风格，我们应该将实现细节隐藏起来。为达成这一点，我们可以将 <code>List</code> 设成结构体：</p>
+<pre><code class="language-rust ignore">pub struct List {
+    head: Link,
+}
+
+enum Link {
+    Empty,
+    More(Box&lt;Node&gt;),
+}
+
+struct Node {
+    elem: i32,
+    next: Link,
+}
+</code></pre>
+<p>由于结构体 <code>List</code> 只有一个字段，那么它的大小即是字段的大小。为零抽象开销点赞！</p>
+<pre><code class="language-text">$ cargo build
+   Compiling lists v0.1.0
+warning: field is never used: `head`
+ --&gt; src/first.rs:2:5
+  |
+2 |     head: Link,
+  |     ^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: variant is never constructed: `Empty`
+ --&gt; src/first.rs:6:5
+  |
+6 |     Empty,
+  |     ^^^^^
+
+warning: variant is never constructed: `More`
+ --&gt; src/first.rs:7:5
+  |
+7 |     More(Box&lt;Node&gt;),
+  |     ^^^^^^^^^^^^^^^
+
+warning: field is never used: `elem`
+  --&gt; src/first.rs:11:5
+   |
+11 |     elem: i32,
+   |     ^^^^^^^^^
+
+warning: field is never used: `next`
+  --&gt; src/first.rs:12:5
+   |
+12 |     next: Link,
+   |
+</code></pre>
+<p>终于编译过了！不过 Rust 依旧很生气，它说我们所写的代码都是无用功。这是因为 <code>head</code> 从来没有被我们用到过，而作为私有字段，它也不能被别人访问。同理，<code>Link</code> 与 <code>Node</code> 中的代码也是毫无用处的。要解决这一问题，就得为我们的 <code>List</code> 实现相关功能。</p>
 
                     </main>
 
